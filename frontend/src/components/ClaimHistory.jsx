@@ -113,8 +113,8 @@ const ClaimHistory = () => {
     if (filteredClaims.length === 0) return;
 
     const exportData = filteredClaims.map(claim => ({
-      claim_id: claim.id,
-      decision: claim.decision,
+      claim_id: claim.claim_id || claim.id,
+      status: claim.status || claim.decision,
       confidence_score: claim.confidence_score,
       reason_code: claim.reason_code,
       reason_description: claim.reason_description,
@@ -379,15 +379,15 @@ const ClaimHistory = () => {
                 </tr>
               ) : (
                 filteredClaims.map((claim, index) => (
-                  <tr key={claim.id || index} className="hover:bg-gray-50 table-row">
+                  <tr key={claim.claim_id || claim.id || index} className="hover:bg-gray-50 table-row">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">
-                        {claim.id}
+                        {claim.claim_id || claim.id}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={getStatusBadgeClasses(claim.decision)}>
-                        {claim.decision}
+                      <span className={getStatusBadgeClasses(claim.status || claim.decision)}>
+                        {claim.status || claim.decision}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">

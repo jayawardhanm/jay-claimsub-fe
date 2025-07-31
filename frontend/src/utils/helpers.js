@@ -172,9 +172,9 @@ export const exportToJSON = (data, filename = 'claims_export') => {
 // Search and filter utilities
 export const filterClaims = (claims, filters) => {
   return claims.filter(claim => {
-    if (filters.status && claim.decision !== filters.status) return false;
+    if (filters.status && getClaimFieldValue(claim, 'decision') !== filters.status) return false;
     if (filters.reasonCode && claim.reason_code !== filters.reasonCode) return false;
-    if (filters.claimId && !claim.id.toLowerCase().includes(filters.claimId.toLowerCase())) return false;
+    if (filters.claimId && !getClaimFieldValue(claim, 'id').toLowerCase().includes(filters.claimId.toLowerCase())) return false;
     if (filters.dateFrom && new Date(claim.processedAt) < new Date(filters.dateFrom)) return false;
     if (filters.dateTo && new Date(claim.processedAt) > new Date(filters.dateTo)) return false;
     if (filters.minConfidence && claim.confidence_score < filters.minConfidence) return false;
@@ -183,10 +183,22 @@ export const filterClaims = (claims, filters) => {
   });
 };
 
+// Helper function to get claim field value with fallback mapping
+const getClaimFieldValue = (claim, fieldName) => {
+  switch (fieldName) {
+    case 'id':
+      return claim.claim_id || claim.id;
+    case 'decision':
+      return claim.status || claim.decision;
+    default:
+      return claim[fieldName];
+  }
+};
+
 export const sortClaims = (claims, sortBy, sortOrder = 'asc') => {
   return [...claims].sort((a, b) => {
-    let aValue = a[sortBy];
-    let bValue = b[sortBy];
+    let aValue = getClaimFieldValue(a, sortBy);
+    let bValue = getClaimFieldValue(b, sortBy);
 
     // Handle different data types
     if (sortBy === 'processedAt') {
